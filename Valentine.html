@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Valentine?</title>
+
+<!-- Pixelify Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    background: #fde7ef;
+    font-family: 'Pixelify Sans', cursive;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  #intro {
+    cursor: pointer;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  #intro img {
+    width: 220px;
+  }
+
+  .window {
+    position: relative;
+    width: 420px;
+    display: none;
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  .window.show {
+    display: block;
+    animation: windowOpen 0.6s steps(6, end) forwards;
+  }
+
+  @keyframes windowOpen {
+    from { transform: scale(0.6); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  .shake {
+    animation: shake 0.25s steps(2, end);
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+  }
+
+  .window img.bg {
+    width: 100%;
+  }
+
+  .content {
+    position: absolute;
+    top: 90px;
+    left: 40px;
+    right: 40px;
+    bottom: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  #soundToggle {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 22px;
+    cursor: pointer;
+  }
+
+  h1 {
+    color: #fffaf5;
+    font-size: 28px;
+    line-height: 1.3;
+    margin-bottom: 14px;
+    text-shadow: 2px 2px 0 #c94b6a;
+  }
+
+  .name {
+    font-weight: 700;
+  }
+
+  .hearts {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .heart {
+    font-size: 20px;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+    position: relative;
+  }
+
+  .btn-img {
+    width: 120px;
+    cursor: pointer;
+    transition: transform 0.2s steps(2, end);
+  }
+
+  #finalCat {
+    display: none;
+    width: 160px;
+    margin-top: 15px;
+  }
+
+  #restartBtn {
+    display: none;
+    margin-top: 14px;
+    padding: 10px 24px;
+    font-family: 'Pixelify Sans', cursive;
+    font-size: 18px;
+    background: #ffd6e5;
+    color: #b81e5b;
+    border: 3px solid #c94b6a;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- AUDIO -->
+<audio id="bgMusic" loop>
+  <source src="best_part.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="clickSound">
+  <source src="click.wav" type="audio/wav">
+</audio>
+
+<!-- INTRO -->
+<div id="intro">
+  <img src="card.png" alt="Click to start">
+</div>
+
+<!-- WINDOW -->
+<div class="window" id="valentineWindow">
+  <img src="window.png" class="bg">
+
+  <div class="content">
+    <div id="soundToggle">🔈</div>
+
+    <div class="hearts" id="heartMeter">
+      <span class="heart">❤️</span>
+      <span class="heart">❤️</span>
+      <span class="heart">❤️</span>
+      <span class="heart">❤️</span>
+      <span class="heart">❤️</span>
+    </div>
+
+    <h1 id="question">
+      Will you be my Valentine,<br>
+      <span class="name">Ms. Alyanna Gan</span>?
+    </h1>
+
+    <div class="buttons" id="buttons">
+      <img src="yes.png" id="yesBtn" class="btn-img">
+      <img src="no.png" id="noBtn" class="btn-img">
+    </div>
+
+    <img id="finalCat" src="cat_dance.gif">
+    <button id="restartBtn">Restart</button>
+  </div>
+</div>
+
+<script>
+  const intro = document.getElementById("intro");
+  const windowBox = document.getElementById("valentineWindow");
+  const question = document.getElementById("question");
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const buttons = document.getElementById("buttons");
+  const finalCat = document.getElementById("finalCat");
+  const restartBtn = document.getElementById("restartBtn");
+  const heartMeter = document.getElementById("heartMeter");
+  const bgMusic = document.getElementById("bgMusic");
+  const clickSound = document.getElementById("clickSound");
+  const soundToggle = document.getElementById("soundToggle");
+
+  let soundEnabled = false;
+  let yesScale = 1;
+  let noScale = 1;
+
+  soundToggle.addEventListener("click", () => {
+    clickSound.currentTime = 0;
+    clickSound.play();
+
+    if (!soundEnabled) {
+      bgMusic.volume = 0.3;
+      bgMusic.play();
+      soundToggle.textContent = "🔊";
+      soundEnabled = true;
+    } else {
+      bgMusic.pause();
+      soundToggle.textContent = "🔈";
+      soundEnabled = false;
+    }
+  });
+
+  intro.addEventListener("click", () => {
+    intro.style.opacity = "0";
+    intro.style.transform = "scale(0.95)";
+    setTimeout(() => {
+      intro.style.display = "none";
+      windowBox.classList.add("show");
+    }, 500);
+  });
+
+  const stages = [
+    "Are you sure? 😢",
+    "Really really sure? 😭",
+    "This is getting painful 💔😞",
+    "I already told my mom 😭",
+    "There is no escape now 😔",
+    "The universe demands <span class='name'>YES</span> 😢"
+  ];
+
+  let stage = 0;
+
+  function drainHeart() {
+    const hearts = heartMeter.querySelectorAll(".heart");
+    if (hearts.length > 0) hearts[hearts.length - 1].remove();
+  }
+
+  function shakeWindow() {
+    windowBox.classList.add("shake");
+    setTimeout(() => windowBox.classList.remove("shake"), 250);
+  }
+
+  function playClick() {
+    if (!soundEnabled) return;
+    clickSound.currentTime = 0;
+    clickSound.play();
+  }
+
+  function moveNo() {
+    const x = Math.random() * 160 - 80;
+    const y = Math.random() * 120 - 60;
+    noBtn.style.transform =
+      `translate(${x}px, ${y}px) scale(${Math.max(noScale, 0.3)})`;
+  }
+
+  noBtn.addEventListener("mouseenter", moveNo);
+
+  noBtn.addEventListener("click", () => {
+    playClick();
+    stage++;
+    noScale -= 0.15;
+    yesScale += 0.25;
+
+    noBtn.style.transform = `scale(${Math.max(noScale, 0.3)})`;
+    yesBtn.style.transform = `scale(${yesScale})`;
+
+    question.innerHTML = stages[Math.min(stage, stages.length - 1)];
+    drainHeart();
+    shakeWindow();
+    moveNo();
+  });
+
+  yesBtn.addEventListener("click", () => {
+    playClick();
+    question.innerHTML = "YAY 💞<br><span class='name'>I knew it!</span>";
+    buttons.style.display = "none";
+    finalCat.style.display = "block";
+    restartBtn.style.display = "block";
+  });
+
+  restartBtn.addEventListener("click", () => {
+    location.reload();
+  });
+</script>
+
+</body>
+</html>
